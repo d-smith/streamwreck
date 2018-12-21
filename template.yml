@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: >
+  Sample stream processing reconcilliation
+Globals:
+  Function:
+    Runtime: "go1.x"
+
+Parameters:
+  Env:
+    Type: String
+    Default: Dev
+
+Resources:
+  StreamProcessor:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Join [ -, [StreamProcessor, !Ref "Env"]]
+      Handler: bin/streamreader
+      Events:
+        StreamEvent:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAtt AppStream.Arn
+            StartingPosition: LATEST
+            BatchSize: 50
+#      Environment:
+#        Variables:
+#          DOWNSTREAM_Q_URL: !Ref Q3
+
+  AppStream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      Name: !Join [ -, [WreakStream, !Ref "Env"]]
+      ShardCount: 1

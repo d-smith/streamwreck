@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Sample stream processing reconcilliation
+
+  '
+Globals:
+  Function:
+    Runtime: go1.x
+Parameters:
+  Env:
+    Default: Dev
+    Type: String
+Resources:
+  AppStream:
+    Properties:
+      Name:
+        Fn::Join:
+        - '-'
+        - - WreakStream
+          - Ref: Env
+      ShardCount: 1
+    Type: AWS::Kinesis::Stream
+  StreamProcessor:
+    Properties:
+      CodeUri: s3://sampack-97068/535eb155f70b8b2b43b946e0ccc7f73d
+      Events:
+        StreamEvent:
+          Properties:
+            BatchSize: 50
+            StartingPosition: LATEST
+            Stream:
+              Fn::GetAtt:
+              - AppStream
+              - Arn
+          Type: Kinesis
+      FunctionName:
+        Fn::Join:
+        - '-'
+        - - StreamProcessor
+          - Ref: Env
+      Handler: bin/streamreader
+    Type: AWS::Serverless::Function
+Transform: AWS::Serverless-2016-10-31
