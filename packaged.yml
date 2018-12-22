@@ -19,9 +19,26 @@ Resources:
           - Ref: Env
       ShardCount: 1
     Type: AWS::Kinesis::Stream
+  ProcessedTopic:
+    Properties:
+      DisplayName:
+        Fn::Join:
+        - '-'
+        - - WreakStreamTopic
+          - Ref: Env
+      TopicName:
+        Fn::Join:
+        - '-'
+        - - WreakStreamTopic
+          - Ref: Env
+    Type: AWS::SNS::Topic
   StreamProcessor:
     Properties:
-      CodeUri: s3://sampack-97068/535eb155f70b8b2b43b946e0ccc7f73d
+      CodeUri: s3://sampack-97068/c49d6c8208b854048fef3c43406219e7
+      Environment:
+        Variables:
+          TOPIC:
+            Ref: ProcessedTopic
       Events:
         StreamEvent:
           Properties:

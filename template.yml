@@ -24,12 +24,18 @@ Resources:
             Stream: !GetAtt AppStream.Arn
             StartingPosition: LATEST
             BatchSize: 50
-#      Environment:
-#        Variables:
-#          DOWNSTREAM_Q_URL: !Ref Q3
+      Environment:
+        Variables:
+          TOPIC: !Ref ProcessedTopic
 
   AppStream:
     Type: AWS::Kinesis::Stream
     Properties:
       Name: !Join [ -, [WreakStream, !Ref "Env"]]
       ShardCount: 1
+
+  ProcessedTopic:
+    Type: AWS::SNS::Topic
+    Properties: 
+      DisplayName: !Join [ -, [WreakStreamTopic, !Ref "Env"]]
+      TopicName: !Join [ -, [WreakStreamTopic, !Ref "Env"]]
