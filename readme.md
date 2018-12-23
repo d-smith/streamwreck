@@ -15,3 +15,9 @@ Write records to yonder stream:
 ```console
 aws kinesis put-record --stream-name WreakStream-Dev --data Data1234Foobar --partition-key foo
 ```
+
+Get logs
+
+```console
+sam logs -n StreamProcessor --stack-name streamwreck
+```
