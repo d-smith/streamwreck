@@ -27,6 +27,9 @@ Resources:
       Environment:
         Variables:
           TOPIC: !Ref ProcessedTopic
+      Policies:
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt ProcessedTopic.TopicName
 
   AppStream:
     Type: AWS::Kinesis::Stream
