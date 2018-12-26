@@ -31,6 +31,19 @@ Resources:
         - SNSPublishMessagePolicy:
             TopicName: !GetAtt ProcessedTopic.TopicName
 
+
+  Notified:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Join [ -, [Notified, !Ref "Env"]]
+      Handler: bin/notified
+      Events:
+        SNSEvent:
+          Type: SNS
+          Properties:
+            Topic: !Ref ProcessedTopic
+
+
   AppStream:
     Type: AWS::Kinesis::Stream
     Properties:
