@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Resources:
+
+  ReconSubnetGroup:
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties:
+      Description: some crap for a required field
+      SubnetIds:
+        - Fn::ImportValue: CacheVpc-Subnet1
+        - Fn::ImportValue: CacheVpc-Subnet2
+
+  ReconCache:
+    Type: AWS::ElastiCache::CacheCluster
+    Properties:
+      CacheNodeType: cache.t2.micro
+      Engine: memcached
+      NumCacheNodes: 1
+      Port: 8765
+      CacheSubnetGroupName: 
+        Ref: ReconSubnetGroup
+      VpcSecurityGroupIds:
+        - 
+          Fn::ImportValue: CacheVpc-LambdaSG
+
+Outputs:
+  Endpoint:
+    Value: !GetAtt ReconCache.ConfigurationEndpoint.Address
+    Export:
+      Name: ReconCache-Endpoint
+
+  Port:
+    Value: !GetAtt ReconCache.ConfigurationEndpoint.Address
+    Export:
+      Name: ReconCache-Port
+

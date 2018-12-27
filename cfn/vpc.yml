@@ -15,27 +15,27 @@ Resources:
       EnableDnsSupport: 'true'
       EnableDnsHostnames: 'true'
 
-  PubSubnetAz1:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref Vpc
-      CidrBlock: '172.31.0.0/24'
-      AvailabilityZone: !Select [ 0, "Fn::GetAZs": !Ref "AWS::Region" ]
-      MapPublicIpOnLaunch: true
-      Tags:
-      - Key: Name
-        Value: public-1
+#  PubSubnetAz1:
+#    Type: AWS::EC2::Subnet
+#    Properties:
+#      VpcId: !Ref Vpc
+#      CidrBlock: '172.31.0.0/24'
+#      AvailabilityZone: !Select [ 0, "Fn::GetAZs": !Ref "AWS::Region" ]
+#      MapPublicIpOnLaunch: true
+#      Tags:
+#      - Key: Name
+#        Value: public-1
 
-  PubSubnetAz2:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref Vpc
-      CidrBlock: '172.31.1.0/24'
-      AvailabilityZone: !Select [ 1, "Fn::GetAZs": !Ref "AWS::Region" ]
-      MapPublicIpOnLaunch: true
-      Tags:
-      - Key: Name
-        Value: public-2
+#  PubSubnetAz2:
+#    Type: AWS::EC2::Subnet
+#    Properties:
+#      VpcId: !Ref Vpc
+#      CidrBlock: '172.31.1.0/24'
+#      AvailabilityZone: !Select [ 1, "Fn::GetAZs": !Ref "AWS::Region" ]
+#      MapPublicIpOnLaunch: true
+#      Tags:
+#      - Key: Name
+#        Value: public-2
 
   PrivateSubnetAz1:
     Type: AWS::EC2::Subnet
@@ -59,39 +59,39 @@ Resources:
 
 ## Gateway and routing
 
-  InternetGateway:
-    Type: AWS::EC2::InternetGateway
+#  InternetGateway:
+#    Type: AWS::EC2::InternetGateway
 
-  AttachGateway:
-    Type: AWS::EC2::VPCGatewayAttachment
-    Properties:
-      VpcId: !Ref Vpc
-      InternetGatewayId: !Ref InternetGateway
+#  AttachGateway:
+#    Type: AWS::EC2::VPCGatewayAttachment
+#    Properties:
+#      VpcId: !Ref Vpc
+#      InternetGatewayId: !Ref InternetGateway
   
-  RouteViaIgw:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !Ref Vpc
+#  RouteViaIgw:
+#    Type: AWS::EC2::RouteTable
+#    Properties:
+#      VpcId: !Ref Vpc
 
-  PublicRouteViaIgw:
-    Type: AWS::EC2::Route
-    DependsOn: AttachGateway
-    Properties:
-      RouteTableId: !Ref RouteViaIgw
-      DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !Ref InternetGateway
+#  PublicRouteViaIgw:
+#    Type: AWS::EC2::Route
+#    DependsOn: AttachGateway
+#    Properties:
+#      RouteTableId: !Ref RouteViaIgw
+#      DestinationCidrBlock: 0.0.0.0/0
+#      GatewayId: !Ref InternetGateway
 
-  PubSubnet1RouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId: !Ref PubSubnetAz1
-      RouteTableId: !Ref RouteViaIgw
+#  PubSubnet1RouteTableAssociation:
+#    Type: AWS::EC2::SubnetRouteTableAssociation
+#    Properties:
+#      SubnetId: !Ref PubSubnetAz1
+#      RouteTableId: !Ref RouteViaIgw
 
-  PubSubnet2RouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId: !Ref PubSubnetAz2
-      RouteTableId: !Ref RouteViaIgw
+#  PubSubnet2RouteTableAssociation:
+#    Type: AWS::EC2::SubnetRouteTableAssociation
+#    Properties:
+#      SubnetId: !Ref PubSubnetAz2
+#      RouteTableId: !Ref RouteViaIgw
 
 ## Private Subnet Az1
 
@@ -100,28 +100,28 @@ Resources:
     Properties:
       VpcId: !Ref Vpc
 
-  NAT1:
-    DependsOn: AttachGateway
-    Type: AWS::EC2::NatGateway
-    Properties:
-        AllocationId:
-          Fn::GetAtt:
-            - EIP1
-            - AllocationId
-        SubnetId:
-          Ref: PubSubnetAz1
-  EIP1:
-    Type: AWS::EC2::EIP
-    Properties:
-        Domain: vpc
-  Route1:
-    Type: AWS::EC2::Route
-    Properties:
-        RouteTableId:
-          Ref: RouteViaNatGW1
-        DestinationCidrBlock: 0.0.0.0/0
-        NatGatewayId:
-          Ref: NAT1   
+#  NAT1:
+#    DependsOn: AttachGateway
+#    Type: AWS::EC2::NatGateway
+#    Properties:
+#        AllocationId:
+#          Fn::GetAtt:
+#            - EIP1
+#            - AllocationId
+#        SubnetId:
+#          Ref: PubSubnetAz1
+#  EIP1:
+#    Type: AWS::EC2::EIP
+#    Properties:
+#        Domain: vpc
+#  Route1:
+#    Type: AWS::EC2::Route
+#    Properties:
+#        RouteTableId:
+#          Ref: RouteViaNatGW1
+#        DestinationCidrBlock: 0.0.0.0/0
+#        NatGatewayId:
+#          Ref: NAT1   
 
   PrivateSubnet1RTA:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -136,28 +136,28 @@ Resources:
     Properties:
       VpcId: !Ref Vpc
 
-  NAT2:
-    DependsOn: AttachGateway
-    Type: AWS::EC2::NatGateway
-    Properties:
-        AllocationId:
-          Fn::GetAtt:
-            - EIP2
-            - AllocationId
-        SubnetId:
-          Ref: PubSubnetAz2
-  EIP2:
-    Type: AWS::EC2::EIP
-    Properties:
-        Domain: vpc
-  Route2:
-    Type: AWS::EC2::Route
-    Properties:
-        RouteTableId:
-          Ref: RouteViaNatGW2
-        DestinationCidrBlock: 0.0.0.0/0
-        NatGatewayId:
-          Ref: NAT2
+#  NAT2:
+#    DependsOn: AttachGateway
+#    Type: AWS::EC2::NatGateway
+#    Properties:
+#        AllocationId:
+#          Fn::GetAtt:
+#            - EIP2
+#            - AllocationId
+#        SubnetId:
+#          Ref: PubSubnetAz2
+#  EIP2:
+#    Type: AWS::EC2::EIP
+#    Properties:
+#        Domain: vpc
+#  Route2:
+#    Type: AWS::EC2::Route
+#    Properties:
+#        RouteTableId:
+#          Ref: RouteViaNatGW2
+#        DestinationCidrBlock: 0.0.0.0/0
+#        NatGatewayId:
+#          Ref: NAT2
 
   PrivateSubnet2RTA:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -165,16 +165,16 @@ Resources:
       SubnetId: !Ref PrivateSubnetAz2
       RouteTableId: !Ref RouteViaNatGW2
 
-  SSHIngress:
+  LambdaIngress:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: SSH Ingress
+      GroupDescription: Lambda Ingress
       VpcId: !Ref Vpc
       SecurityGroupIngress:
         IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        CidrIp: 73.180.44.191/32
+        FromPort: 8765
+        ToPort: 8765
+        CidrIp: 172.31.3.0/24
 
 Outputs:
   VpcId:
@@ -183,19 +183,26 @@ Outputs:
  
   PrivateSubnet1:
     Value: !Ref PrivateSubnetAz1
+    Export:
+      Name: CacheVpc-Subnet1
+    
 
   PrivateSubnet2:
     Value: !Ref PrivateSubnetAz2
+    Export:
+      Name: CacheVpc-Subnet2
 
-  PublicSubnet1:
-    Value: !Ref PubSubnetAz1
+#  PublicSubnet1:
+#    Value: !Ref PubSubnetAz1
 
-  PublicSubnet2:
-    Value: !Ref PubSubnetAz2
+#  PublicSubnet2:
+#    Value: !Ref PubSubnetAz2
 
-  SSHIngress:
-    Description: Security group id of the ECS cluster instances
-    Value: !GetAtt SSHIngress.GroupId
+  LambdaIngress:
+    Description: Security group id for cache ingress from lambdas placed in the vpc
+    Value: !GetAtt LambdaIngress.GroupId
+    Export:
+      Name: CacheVpc-LambdaSG
   
   DefaultSecurityGroup:
     Value: !GetAtt Vpc.DefaultSecurityGroup
