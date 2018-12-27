@@ -63,7 +63,7 @@ func handler(ctx context.Context, kinesisEvent events.KinesisEvent) error {
 		}
 
 		fmt.Printf("Process record %+v\n", kinesisRecord)
-		if err := sendIt(string(kinesisRecord.Data)); err != nil {
+		if err := sendIt(string(kinesisRecord.SequenceNumber)); err != nil {
 			fmt.Println("Error publishing:", err)
 		}
 	}

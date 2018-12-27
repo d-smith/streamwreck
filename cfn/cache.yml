@@ -1,5 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
+Parameters:
+  VpcStackName:
+    Type: String
+    Default: vpc-dev
+
 Resources:
 
   ReconSubnetGroup:
@@ -7,8 +12,8 @@ Resources:
     Properties:
       Description: some crap for a required field
       SubnetIds:
-        - Fn::ImportValue: CacheVpc-Subnet1
-        - Fn::ImportValue: CacheVpc-Subnet2
+        - Fn::ImportValue: !Join [ -, [ CacheVpc, Ref: "VpcStackName", Subnet1 ]]
+        - Fn::ImportValue: !Join [ -, [ CacheVpc, Ref: "VpcStackName", Subnet2 ]]
 
   ReconCache:
     Type: AWS::ElastiCache::CacheCluster
@@ -21,16 +26,16 @@ Resources:
         Ref: ReconSubnetGroup
       VpcSecurityGroupIds:
         - 
-          Fn::ImportValue: CacheVpc-LambdaSG
+          Fn::ImportValue: !Join [ -, [ CacheVpc, Ref: "VpcStackName", LambdaSG ]]
 
 Outputs:
   Endpoint:
     Value: !GetAtt ReconCache.ConfigurationEndpoint.Address
     Export:
-      Name: ReconCache-Endpoint
+      Name: !Join [ -, [ ReconCache, Ref: "AWS::StackName", Endpoint ]]
 
   Port:
-    Value: !GetAtt ReconCache.ConfigurationEndpoint.Address
+    Value: !GetAtt ReconCache.ConfigurationEndpoint.Port
     Export:
-      Name: ReconCache-Port
+      Name: !Join [ -, [ ReconCache, Ref: "AWS::StackName", Port ]]
 

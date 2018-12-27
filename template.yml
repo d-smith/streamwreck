@@ -10,6 +10,12 @@ Parameters:
   Env:
     Type: String
     Default: Dev
+  VpcStackName:
+    Type: String
+    Default: vpc-dev
+  CacheStackName:
+    Type: String
+    Default: mycache
 
 Resources:
   StreamProcessor:
@@ -30,13 +36,25 @@ Resources:
       Policies:
         - SNSPublishMessagePolicy:
             TopicName: !GetAtt ProcessedTopic.TopicName
-
-
   Notified:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: !Join [ -, [Notified, !Ref "Env"]]
       Handler: bin/notified
+      Policies:
+        - VPCAccessPolicy: {}
+      VpcConfig:
+        SecurityGroupIds:
+          - Fn::ImportValue: !Join [ -, [ CacheVpc, Ref: "VpcStackName", LambdaSG ]]
+        SubnetIds:
+          - Fn::ImportValue: !Join [ -, [ CacheVpc, Ref: "VpcStackName", Subnet1 ]]
+          - Fn::ImportValue: !Join [ -, [ CacheVpc, Ref: "VpcStackName", Subnet2 ]]
+      Environment:
+        Variables:
+          MEMCACHED_ENDPOINT: 
+            Fn::ImportValue: !Join [ -, [ ReconCache, Ref: "CacheStackName", Endpoint ]]
+          MEMCACHED_PORT: 
+            Fn::ImportValue: !Join [ -, [ ReconCache, Ref: "CacheStackName", Port ]]
       Events:
         SNSEvent:
           Type: SNS

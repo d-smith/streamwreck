@@ -184,13 +184,13 @@ Outputs:
   PrivateSubnet1:
     Value: !Ref PrivateSubnetAz1
     Export:
-      Name: CacheVpc-Subnet1
+      Name: !Join [ -, [ CacheVpc, Ref: "AWS::StackName", Subnet1 ]]
     
 
   PrivateSubnet2:
     Value: !Ref PrivateSubnetAz2
     Export:
-      Name: CacheVpc-Subnet2
+      Name: !Join [ -, [ CacheVpc, Ref: "AWS::StackName", Subnet2 ]]
 
 #  PublicSubnet1:
 #    Value: !Ref PubSubnetAz1
@@ -202,7 +202,7 @@ Outputs:
     Description: Security group id for cache ingress from lambdas placed in the vpc
     Value: !GetAtt LambdaIngress.GroupId
     Export:
-      Name: CacheVpc-LambdaSG
+      Name: !Join [ -, [ CacheVpc, Ref: "AWS::StackName", LambdaSG ]]
   
   DefaultSecurityGroup:
     Value: !GetAtt Vpc.DefaultSecurityGroup
