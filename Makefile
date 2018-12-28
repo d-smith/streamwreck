@@ -1,4 +1,7 @@
-compile: streamreader notified
+compile: streamreader notified checker
+
+checker:
+	GOOS=linux go build -o bin/checker functions/checker/*.go
 
 streamreader:
 	GOOS=linux go build -o bin/streamreader functions/streamreader/*.go

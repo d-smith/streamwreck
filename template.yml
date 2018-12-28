@@ -61,6 +61,17 @@ Resources:
           Properties:
             Topic: !Ref ProcessedTopic
 
+  Checker:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Join [ -, [Checker, !Ref "Env"]]
+      Handler: bin/checker
+      Events:
+        ChecerApiEvent:
+          Type: Api
+          Properties:
+            Path: /reconcile
+            Method: post
 
   AppStream:
     Type: AWS::Kinesis::Stream
