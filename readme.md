@@ -21,3 +21,5 @@ Get logs
 ```console
 sam logs -n StreamProcessor --stack-name streamwreck
 ```
+
+## TODO - redo API to use Api resource not function with http event
