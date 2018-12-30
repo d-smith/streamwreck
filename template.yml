@@ -66,6 +66,22 @@ Resources:
     Properties:
       FunctionName: !Join [ -, [Checker, !Ref "Env"]]
       Handler: bin/checker
+      Policies:
+        - VPCAccessPolicy: {}
+      VpcConfig:
+        SecurityGroupIds:
+          - Fn::ImportValue: !Join [ -, [ CacheVpc, Ref: "VpcStackName", LambdaSG ]]
+        SubnetIds:
+          - Fn::ImportValue: !Join [ -, [ CacheVpc, Ref: "VpcStackName", Subnet1 ]]
+          - Fn::ImportValue: !Join [ -, [ CacheVpc, Ref: "VpcStackName", Subnet2 ]]
+      Environment:
+        Variables:
+          MEMCACHED_ENDPOINT: 
+            Fn::ImportValue: !Join [ -, [ ReconCache, Ref: "CacheStackName", Endpoint ]]
+          MEMCACHED_PORT: 
+            Fn::ImportValue: !Join [ -, [ ReconCache, Ref: "CacheStackName", Port ]]
+
+
       Events:
         ChecerApiEvent:
           Type: Api
