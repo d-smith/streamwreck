@@ -2,6 +2,16 @@
 
 Reconcile the records read from a stream from those written to a stream.
 
+# Overview
+
+The following diagram shows the solution components.
+
+![](./Components.png)
+
+In this pattern, a producer application writes events to a Kinesis stream, which are processed by a lambda function. The lambda function writes an entry to ElastiCache for each stream record processed, using the sequence number to identity the record. Another lambda implements a simple API that takes an array of sequence numbers and indicates in its response any that have not been recorded as being processed in ElastiCache.
+
+To reconsole the stream events with the processed events, a client can read the records from the stream, call the reconcilliation API, and determine which have events have not been processed.
+
 ## Notes
 
 Create the vpc: 
