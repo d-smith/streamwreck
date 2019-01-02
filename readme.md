@@ -79,11 +79,12 @@ For example:
 
 ```console
 curl https://0gs925saae.execute-api.us-east-1.amazonaws.com/Stage/reconcile -d '["49591585917767627211020937568791696204996217827017883650", "49591585917767627211020937568796531908274676481155661826", "49591585917767627211020937568800158685733520506118733826"]'
+```
 
 Run the stream checker to check all records from the TRIM_HORIZON to see if they've been processed:
 
 ```console
-
+go run streamchecker/main.go --stream WreakStream-Dev --endpoint https://hyqj92kmud.execute-api.us-east-1.amazonaws.com/Stage/reconcile
 ```
 
 ## TODOs
