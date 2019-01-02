@@ -1,7 +1,11 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"sync"
 	"time"
@@ -13,7 +17,8 @@ import (
 )
 
 var (
-	streamName = kingpin.Flag("stream", "Stream to check").Required().String()
+	streamName        = kingpin.Flag("stream", "Stream to check").Required().String()
+	reconcileEndpoint = kingpin.Flag("endpoint", "Reconcile API endpoint").Required().String()
 )
 
 func getShardIds(kinesisSvc *kinesis.Kinesis, streamName *string) ([]string, error) {
@@ -39,10 +44,38 @@ func getShardIds(kinesisSvc *kinesis.Kinesis, streamName *string) ([]string, err
 	return shardIds, err
 }
 
-func processRecords(records []*kinesis.Record) {
+func processRecords(records []*kinesis.Record, endpoint *string) {
+	var seqNos []string
+
+	//Extract sequence numbers to check
 	for _, rec := range records {
-		fmt.Println("process seq no ", rec.SequenceNumber)
+		seqNos = append(seqNos, *rec.SequenceNumber)
 	}
+
+	fmt.Println("checking", seqNos)
+
+	//Form payload
+	payloadBytes, err := json.Marshal(&seqNos)
+	if err != nil {
+		fmt.Printf("WARNING: errors marshaling payload: %s", err.Error())
+		return
+	}
+
+	//Invoke endpoint
+	resp, err := http.Post(*endpoint, "application/json", bytes.NewBuffer(payloadBytes))
+	if err != nil {
+		fmt.Println("Error invoking reconcile API", err.Error())
+		return
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("Error reading body", err.Error())
+		return
+	}
+
+	fmt.Println(string(body))
 }
 
 func readStreamRecords(kinesisSvc *kinesis.Kinesis, shardID, streamName string, wg *sync.WaitGroup) {
@@ -81,7 +114,7 @@ func readStreamRecords(kinesisSvc *kinesis.Kinesis, shardID, streamName string, 
 			fmt.Println("No records to process...")
 			break
 		default:
-			processRecords(getRecordsOutput.Records)
+			processRecords(getRecordsOutput.Records, reconcileEndpoint)
 		}
 
 		shardIterator = getRecordsOutput.NextShardIterator
@@ -106,11 +139,6 @@ func main() {
 
 	session := session.Must(session.NewSession())
 	kinesisSvc := kinesis.New(session)
-
-	//GetRecords - needs a shard iterator
-	//Use GetShardIterator for the initial shard
-	//  -- Needs a shard id to get the iterator
-	//Use ListShards to get the shard names for the stream
 
 	out, err := getShardIds(kinesisSvc, streamName)
 
