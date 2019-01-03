@@ -1,8 +1,8 @@
 # streamwreck
 
-Reconcile the records read from a stream from those written to a stream.
+Reconcile the records processed from a stream from those written to a stream.
 
-# Overview
+## Overview
 
 The following diagram shows the solution components.
 
