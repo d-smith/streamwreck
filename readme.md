@@ -10,11 +10,11 @@ The following diagram shows the solution components.
 
 In this pattern, a producer application writes events to a Kinesis stream, which are processed by a lambda function. The lambda function publishes an event indicating the record was processed. Another lambda which is subscribed to the 'event processed' topic writes an entry to ElastiCache for each stream record processed, using the sequence number to identity the record. Another lambda implements a simple API that takes an array of sequence numbers and indicates in its response any that have not been recorded as being processed in ElastiCache.
 
-To reconcile the stream events with the processed events, a client can read the records from the stream, call the reconcilliation API, and determine which have events have not been processed.
+To reconcile the stream events against the processed events, a client can read the records from the stream, call the reconcilliation API, and determine which have events have not been processed.
 
 This project provides:
 
-* Cloud formation to instantiate all the infrastructure needed to exercise this pattern
+* Cloud formation templates to instantiate all infrastructure needed to exercise this pattern
 * A lambda function to simulate processing of events from the stream, producing notifications of processed records (the stream processor lambda). For this sample, Kinesis records evenly divisible by 5 are skipped, thus leaving unprocessed records that can be identified via the reconcilliation process.
 * A lambda function that subscribes to the SNS notification topic, which records the processed records as key/value pairs in Elasticache (notified lambda).
 * An API that takes a list of Kinesis sequence numbers and indicates which of those have not been processed (checker lambda). This API does a lookup of each record in Kinesis, using the sequence number as key.
