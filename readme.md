@@ -8,7 +8,7 @@ The following diagram shows the solution components.
 
 ![](./Components.png)
 
-In this pattern, a producer application writes events to a Kinesis stream, which are processed by a lambda function. The lambda function publishes an event indicating the record was processed. Another lambda which is subscribed to the 'event processed' topic writes an entry to ElastiCache for each stream record processed, using the sequence number to identity the record. Another lambda implements a simple API that takes an array of sequence numbers and indicates in its response any that have not been recorded as being processed in ElastiCache.
+In this pattern, a producer application writes events to a Kinesis stream, which are processed by a lambda function. The lambda function publishes an event indicating the record was processed. Another lambda which is subscribed to the 'event processed' topic writes an entry to ElastiCache for each stream record processed, using the sequence number to identify the record. Another lambda implements a simple API that takes an array of sequence numbers and indicates in its response any that have not been recorded as being processed in ElastiCache.
 
 To reconcile the stream events against the processed events, a client can read the records from the stream, call the reconcilliation API, and determine which have events have not been processed.
 
